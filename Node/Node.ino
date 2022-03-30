@@ -7,15 +7,15 @@
 
 
 #ifndef STASSID
-#define STASSID "Leo's Den"
-#define STAPSK "blueflute165"
+#define STASSID "IU PublicNet"
+#define STAPSK NULL
 #endif
 
 const char* ssid = STASSID;
 const char* pass = STAPSK;
 const uint8_t servoPin = 5;
 const int led = 13;
-
+bool debug = false;
 int httpCode;
 int floor_code;
 String payload;
@@ -76,6 +76,8 @@ void setup() {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
+  Serial.print("MAC: ");
+  Serial.println(WiFi.macAddress());
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 
@@ -109,28 +111,30 @@ void setup() {
 void loop() {
   server.handleClient();
   MDNS.update();
-  httpCode = http.GET();
-  if (httpCode > 0){
-    Serial.print("HTTP CODE:");
-    Serial.println(httpCode);
-    payload = http.getString();
-    Serial.println(payload);
-    floor_code = payload.toInt();
-    if (floor_code == -1){
-      Serial.println("No Waiting calls");
+  if (!debug){
+    httpCode = http.GET();
+    if (httpCode > 0){
+      Serial.print("HTTP CODE:");
+      Serial.println(httpCode);
+      payload = http.getString();
+      Serial.println(payload);
+      floor_code = payload.toInt();
+      if (floor_code == -1){
+        Serial.println("No Waiting calls");
+      }
+      if(floor_code == 0){
+        Serial.println("DOWN BUTTON PRESSED");
+        press_down();
+      }
+      if(floor_code == 1){
+        Serial.println("UP BUTTON PRESSED");
+        press_up();
+      }
+      else{
+        Serial.print("FLOOR ");
+        Serial.println(floor_code);
+      }
     }
-    if(floor_code == 0){
-      Serial.println("DOWN BUTTON PRESSED");
-      press_down();
-    }
-    if(floor_code == 1){
-      Serial.println("UP BUTTON PRESSED");
-      press_up();
-    }
-    else{
-      Serial.print("FLOOR ");
-      Serial.println(floor_code);
-    }
+    delay(5000);
   }
-  delay(5000);
 }
