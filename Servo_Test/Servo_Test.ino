@@ -2,6 +2,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+
 
 #ifndef STASSID
 #define STASSID "Device Net"
@@ -12,9 +15,15 @@ const char* ssid = STASSID;
 const char* pass = STAPSK;
 const uint8_t servoPin = 5;
 const int led = 13;
+bool debug = true;
+int httpCode;
+int floor_code;
+String payload;
 
 Servo servo;
 ESP8266WebServer server(80);
+HTTPClient http;
+WiFiClient wifi;
 
 
 void handleRoot() {
@@ -67,6 +76,8 @@ void setup() {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
+  Serial.print("MAC: ");
+  Serial.println(WiFi.macAddress());
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 
@@ -89,6 +100,7 @@ void setup() {
   server.on("/press0", press_down);
   server.onNotFound(handleNotFound);
   server.begin();
+  http.begin(wifi, "http://ec2-18-219-245-250.us-east-2.compute.amazonaws.com/getCall");
   Serial.println("HTTP server started");
   servo.attach(servoPin);
   servo.write(90);
@@ -99,4 +111,30 @@ void setup() {
 void loop() {
   server.handleClient();
   MDNS.update();
+  if (!debug){
+    httpCode = http.GET();
+    if (httpCode > 0){
+      Serial.print("HTTP CODE:");
+      Serial.println(httpCode);
+      payload = http.getString();
+      Serial.println(payload);
+      floor_code = payload.toInt();
+      if (floor_code == -1){
+        Serial.println("No Waiting calls");
+      }
+      if(floor_code == 0){
+        Serial.println("DOWN BUTTON PRESSED");
+        press_down();
+      }
+      if(floor_code == 1){
+        Serial.println("UP BUTTON PRESSED");
+        press_up();
+      }
+      else{
+        Serial.print("FLOOR ");
+        Serial.println(floor_code);
+      }
+    }
+    delay(5000);
+  }
 }
