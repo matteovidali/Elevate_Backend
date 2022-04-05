@@ -17,6 +17,9 @@ def get_floor(s):
     
     return int(s)
 
+# brief:          Checks if a gien node exists in a node_list
+# param  node_id: a string to check in the node id list
+# retval:         bool - True if exists 
 def check_node(node_id):
     node_ids = ['luddy_1']
 
@@ -47,10 +50,15 @@ def call_floor(node_id, floor):
     CALL_LIST.append((node_id, floor))
     return f'Calling {floor} @ node {node_id}'
 
-# brief:
+# brief:    Gives a list of the current waiting rides
+# param:    None
+# retval:   json - list of calls
 def check_list():
     return jsonify(CALL_LIST)
 
+# brief:    returns next waiting call
+# param:    None
+# retval:   call
 def get_next_call():
     if len(CALL_LIST) == 0:
         return '-1'

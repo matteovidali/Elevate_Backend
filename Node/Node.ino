@@ -12,7 +12,7 @@
 #endif
 
 bool debug = false; // Turn to true for local server only
-bool strings = true;
+bool strings = true; // turn false to remove serial printing
 
 
 const char* ssid = STASSID;
