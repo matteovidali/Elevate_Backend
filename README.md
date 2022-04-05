@@ -16,7 +16,7 @@ AND
 The reason for these two development meathods is to slowly integrate with campus elevators by first using a non-invasive proof of concept (1) to cause no damage or modification to campus elevators, and once concept has been proven useful and sucessful, to be integrated more permanently.
 
 ## Frontend
- ___ TBD ____
+ - https://github.com/cdaleide/Elevate-App/
  
 ## Authors
  - Matteo Vidali (mvidali@iu.edu)[mvidali@iu.edu] (Lead backend developer)
